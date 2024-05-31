@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "arfc6455"
+version = "0.1.0"
+description = "Async Impl. of RFC 6455 (The Websocket Protocol) in Python."
+authors = ["mooncell07 <80042274+mooncell07@users.noreply.github.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^3.7.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
