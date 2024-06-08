@@ -1,5 +1,6 @@
 import asyncio
 import ssl
+from urllib.parse import urlparse
 
 
 class Context:
@@ -11,7 +12,7 @@ class Context:
         loop: None | asyncio.AbstractEventLoop = None,
         ssl_context: None | ssl.SSLContext = None
     ):
-        self.url = url
+        self.url_struct = urlparse(url)
         self.port = port
         self.loop = (
             loop if isinstance(loop, asyncio.BaseEventLoop) else _get_event_loop()
@@ -25,11 +26,6 @@ class Context:
         self.transport: asyncio.Transport | None = None
         self.on_connect_event: asyncio.Event = asyncio.Event()
         self.on_disconnect_event: asyncio.Event = asyncio.Event()
-
-        self.handshake_string: str = self._create_handshake_string()
-
-    def _create_handshake_string(self):
-        raise NotImplementedError
 
 
 def _get_ssl_context() -> ssl.SSLContext:
