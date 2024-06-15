@@ -5,6 +5,7 @@ import secrets
 from enum import Enum
 
 from .context import Context
+from .exceptions import AuthenticationError
 from .response import Response
 
 GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
@@ -52,11 +53,15 @@ class Protocol(asyncio.Protocol):
         match self.state:
             case WebsocketState.CONNECTING:
                 self.__response = Response(data)
-                top_level_header, headers = self.__response.parse_headers()
-                if key := headers.get(b"sec-websocket-accept"):
-                    if key == self.__local_accept_key:
-                        self.__local_accept_key = None
-                        self.__response.data = None
+                headers = self.__response.parse_headers()
+                if key := headers.get("SEC-WEBSOCKET-ACCEPT"):
+                    if key != self.__local_accept_key:
+                        raise AuthenticationError(
+                            "Server Handshake Response Key does not match with the local key."
+                        ) from None
+
+                    self.__local_accept_key = None
+                    self.__response.data = None
 
                 self.state = WebsocketState.CONNECTED
 
