@@ -58,7 +58,7 @@ class Protocol(asyncio.Protocol):
                     if key != self.__local_accept_key:
                         raise AuthenticationError(
                             "Server Handshake Response Key does not match with the local key."
-                        ) from None
+                        )
 
                     self.__local_accept_key = None
                     self.__response.data = None
