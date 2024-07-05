@@ -63,10 +63,12 @@ class Protocol(asyncio.Protocol):
                     self.__local_accept_key = None
                     self.__response.data = None
 
+                self.__response.handshake_complete = True
                 self.state = WebsocketState.CONNECTED
 
             case WebsocketState.CONNECTED:
-                raise NotImplementedError
+                self.__response.data = data
+
             case WebsocketState.CLOSING:
                 raise NotImplementedError
 

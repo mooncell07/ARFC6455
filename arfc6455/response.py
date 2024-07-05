@@ -1,6 +1,7 @@
 import typing as t
 
 from .exceptions import HandshakeError, MalformedPayloadError
+from .frame import Frame
 
 
 class Response:
@@ -9,6 +10,8 @@ class Response:
 
     def __init__(self, data: bytes) -> None:
         self.data = data
+        self.frame = None
+        self.handshake_complete = False
 
     def _validate_headers(
         self, header_status: list[str], header_object: dict[str, bytes]
@@ -22,6 +25,9 @@ class Response:
             )
 
     def parse_headers(self) -> dict[str, bytes]:
+        if self.handshake_complete:
+            return self.frame.headers
+
         header_lines = self.data.strip().splitlines()
         headers_clean = map(lambda entry: entry.split(b":", 1), header_lines[1::])
         header_object = {
@@ -31,3 +37,11 @@ class Response:
 
         self._validate_headers(header_status, header_object)
         return header_object
+
+    def parse_data(self):
+        if self.frame is None:
+            self.frame = Frame.from_bytes(self.data)
+        else:
+            self.frame.refresh(self.data)
+
+        return self.frame.decode()
